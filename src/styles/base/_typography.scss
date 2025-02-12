@@ -24,6 +24,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Lato';
+  src: url('../../assets/fonts/Lato-Italic.ttf') format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 body {
   font-family: $ff-sans;
   font-size: fs(400);
