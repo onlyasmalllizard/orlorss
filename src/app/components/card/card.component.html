@@ -1,0 +1,19 @@
+<article class="bg-neutral-100 clr-neutral-800">
+  <div class="card-header | bg-neutral-400 clr-neutral-100 | padding-16">
+    <a [href]="article.url"
+      class="clr-primary-400">{{ article.source }}</a>
+
+    <p class="fs-300 fw-light">{{ article.publishedAt | date:'MMM d yyyy | hh:mm' }}</p>
+  </div>
+
+  @if(article.image) {
+    <img [src]="article.image"
+         alt="" />
+  }
+
+  <div class="flow | padding-16">
+    <h2 class="fs-500 fw-light">{{ article.title }}</h2>
+
+    <p class="fw-bold">{{ article.content }}</p>
+  </div>
+</article>
