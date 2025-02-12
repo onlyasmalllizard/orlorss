@@ -1,0 +1,5 @@
+@use '../abstracts' as *;
+
+.flow > *:where(:not(:first-child)) {
+   margin-block-start: var(--flow-spacer, size(16));
+}

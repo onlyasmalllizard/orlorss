@@ -1,0 +1,9 @@
+@use '../abstracts' as *;
+
+@each $colour, $shade-map in $colours {
+  @each $shade, $value in $shade-map {
+    .clr-#{$colour}-#{$shade} { color: $value; }
+
+    .bg-#{$colour}-#{$shade} { background-color: $value; }
+  }
+}
