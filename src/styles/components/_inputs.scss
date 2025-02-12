@@ -1,0 +1,10 @@
+@use '../abstracts' as *;
+
+input {
+  background-color: clr('neutral', 800);
+  border-radius: size(20);
+  border: 2px solid clr('neutral', 200);
+  color: clr('neutral', 200);
+  padding: size(8) size(16);
+  font-style: italic;
+}
