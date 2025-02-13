@@ -1,0 +1,25 @@
+@use '../../../styles/abstracts' as *;
+
+li {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &:before {
+    content: '\200B';
+    border: 2px solid clr('neutral', 100);
+    border-radius: 50%;
+    width: size(16);
+    height: size(16);
+  }
+}
+
+button {
+  border: none;
+  border-radius: 50%;
+  background-color: clr('alert', 400);
+  color: clr('neutral', 100);
+  width: size(20);
+  height: size(20);
+}
