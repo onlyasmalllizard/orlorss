@@ -1,0 +1,19 @@
+<section class="feed-filter | grid-flow | clr-neutral-100">
+  <div>
+    <label for="feed-filter"
+           class="visually-hidden">Filter your feeds</label>
+
+    <input id="feed-filter"
+           placeholder="Filter your feeds..."
+           class="margin-inline-end-32"/>
+
+    <fa-icon [icon]="faMagnifyingGlass"
+             class="fa-2xl"></fa-icon>
+  </div>
+
+  <ul class="grid-flow">
+    @for (filter of filters; track $index) {
+      <app-list-item>{{ filter }}</app-list-item>
+    }
+  </ul>
+</section>
