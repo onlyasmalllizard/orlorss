@@ -1,25 +1,26 @@
 @use '../../../styles/abstracts' as *;
 
-li {
+.list-item {
   list-style-type: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 
   &:before {
+    display: inline-block;
+    // This is a zero-width space that prevents Voiceover from deciding that the list is not a list because we've turned off the native bullets
     content: '\200B';
     border: 2px solid clr('neutral', 100);
     border-radius: 50%;
-    width: size(16);
-    height: size(16);
+    width: size(20);
+    height: size(20);
+    margin-inline-end: size(16);
   }
-}
 
-button {
-  border: none;
-  border-radius: 50%;
-  background-color: clr('alert', 400);
-  color: clr('neutral', 100);
-  width: size(20);
-  height: size(20);
+  button {
+    float: right;
+    border: none;
+    border-radius: 50%;
+    background-color: clr('alert', 400);
+    color: clr('neutral', 100);
+    width: size(20);
+    height: size(20);
+  }
 }
