@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import {ListItemComponent} from "../list-item/list-item.component";
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {FaIconComponent, IconDefinition} from "@fortawesome/angular-fontawesome";
+import {ListComponent} from "../list/list.component";
 
 @Component({
   selector: 'app-content-filter',
   imports: [
-    ListItemComponent,
-    FaIconComponent
+    FaIconComponent,
+    ListComponent
   ],
   templateUrl: './content-filter.component.html',
   styleUrl: './content-filter.component.scss',

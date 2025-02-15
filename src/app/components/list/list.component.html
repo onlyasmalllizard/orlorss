@@ -1,0 +1,13 @@
+<ul class="grid-flow">
+  @for (item of listItems; track $index) {
+    <li class="list-item">
+      {{ item }}
+
+      <button>
+        <fa-icon [icon]="faXmark"></fa-icon>
+
+        <span class="visually-hidden">Delete item</span>
+      </button>
+    </li>
+  }
+</ul>

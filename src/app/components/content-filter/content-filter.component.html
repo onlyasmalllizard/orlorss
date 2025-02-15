@@ -11,9 +11,5 @@
              class="fa-2xl"></fa-icon>
   </div>
 
-  <ul class="grid-flow">
-    @for (filter of filters; track $index) {
-      <app-list-item>{{ filter }}</app-list-item>
-    }
-  </ul>
+  <app-list></app-list>
 </section>
