@@ -1,0 +1,6 @@
+@use '../abstracts' as *;
+
+.grid-flow {
+  display: grid;
+  gap: var(--flow-spacer, size(16));
+}
