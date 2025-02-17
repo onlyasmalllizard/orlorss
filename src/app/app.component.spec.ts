@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import {FeedService} from "./services/feed.service";
+import {feedServiceMock} from "./utils/testing/service-mocks/feed-service.mock";
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -7,6 +9,9 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
+      providers: [
+        { provide: FeedService, useValue: feedServiceMock() }
+      ]
     }).compileComponents();
   });
 
