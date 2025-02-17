@@ -149,6 +149,16 @@ export class FeedService {
           return of([]);
         }
       }),
+      map(responses => {
+        return responses.map(response => ({
+          ...response,
+          feed: {
+            ...response.feed,
+            // Uses the feed name the user typed, with the official title as a backup
+            title: this.feeds.find(feed => feed.url === response.feed.url)?.name ?? response.feed.title
+          }
+        }))
+      }),
       tap(content => this.content$.next(content))
     )
   }
