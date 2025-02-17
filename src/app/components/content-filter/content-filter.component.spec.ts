@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ContentFilterComponent } from './content-filter.component';
+import {ListComponent} from "../list/list.component";
+import {FeedService} from "../../services/feed.service";
+import {feedServiceMock} from "../../utils/testing/service-mocks/feed-service.mock";
 
 describe('ContentFilterComponent', () => {
   let component: ContentFilterComponent;
@@ -8,7 +10,13 @@ describe('ContentFilterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ContentFilterComponent]
+      imports: [
+        ContentFilterComponent,
+        ListComponent
+      ],
+      providers: [
+        { provide: FeedService, useValue: feedServiceMock() }
+      ]
     })
     .compileComponents();
 

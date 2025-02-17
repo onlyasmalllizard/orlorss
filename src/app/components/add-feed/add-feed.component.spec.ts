@@ -2,10 +2,9 @@ import { render } from '@testing-library/angular';
 import { AddFeedComponent } from './add-feed.component';
 import {FeedService} from "../../services/feed.service";
 import {userEvent} from "@testing-library/user-event";
+import {feedServiceMock} from "../../utils/testing/service-mocks/feed-service.mock";
 
-const feedService = {
-  addFeed: jest.fn()
-};
+const feedService = feedServiceMock();
 
 const setup = () => render(AddFeedComponent, {
   providers: [
