@@ -27,7 +27,7 @@ export class FeedService {
   public articles$: Observable<Article[]> = this.content$.pipe(
     tap(content => console.log({content})),
     map(
-      rssResponses => rssResponses.reduce((articles, rssResponse) => ([ ...articles, ...this.mapDataToArticles(rssResponse)]), [] as Article[])
+      rssResponses => rssResponses.reduce((articles, rssResponse) => ([...articles, ...this.mapDataToArticles(rssResponse)]), [] as Article[])
     )
   );
   public sources$: Observable<Source[]> = this.articles$.pipe(
@@ -52,11 +52,20 @@ export class FeedService {
 
   constructor(
     private readonly http: HttpClient
-  ) {}
+  ) {
+  }
+
+  public addFeed(newFeed: string): void {
+    if (!this.feeds.includes(newFeed)) {
+      this.updateFeeds([...this.feeds, newFeed]);
+    }
+  }
 
   public deleteFeed(feedToDelete: string): void {
-    const updatedFeeds = this.feeds.filter(feed => feed !== feedToDelete);
+    this.updateFeeds(this.feeds.filter(feed => feed !== feedToDelete));
+  }
 
+  private updateFeeds(updatedFeeds: string[]): void {
     localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify(updatedFeeds));
     this.feeds$.next(updatedFeeds);
   }

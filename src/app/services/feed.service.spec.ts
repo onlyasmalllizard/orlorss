@@ -26,6 +26,41 @@ describe('FeedService', () => {
     expect(service).toBeTruthy();
   });
 
+  describe('addFeed', () => {
+    beforeEach(() => localStorage.clear());
+
+    it('should add the given feed to the service and to localstorage', waitForAsync(() => {
+      const newFeed = 'test';
+      const expected = [newFeed];
+
+      service.addFeed(newFeed);
+
+      const localStorageResult = JSON.parse(localStorage.getItem(LocalStorage.FeedUrls) ?? '');
+      expect(localStorageResult).toEqual(expected);
+      // @ts-expect-error asserting on private property
+      service.feeds$.subscribe({
+        next: feeds => expect(feeds).toEqual(expected),
+        error: e => fail(e)
+      });
+    }));
+
+    it('should not add the feed if it is already stored', waitForAsync(() => {
+      const initialFeeds = ['test'];
+      // @ts-expect-error setting private property
+      service.feeds$.next(initialFeeds);
+      // @ts-expect-error setting private property
+      service.feeds = initialFeeds;
+
+      service.addFeed('test');
+
+      // @ts-expect-error asserting on private property
+      service.feeds$.subscribe({
+        next: feeds => expect(feeds).toEqual(initialFeeds),
+        error: e => fail(e)
+      });
+    }));
+  });
+
   describe('deleteFeed', () => {
     beforeEach(() => localStorage.clear());
 
