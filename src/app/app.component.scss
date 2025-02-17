@@ -2,6 +2,7 @@
 
 main {
   display: grid;
+  min-height: 100svh;
 
   @include mq(small) {
     grid-template-columns: max-content 1fr;
