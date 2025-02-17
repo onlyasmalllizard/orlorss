@@ -1,0 +1,13 @@
+.sidebar {
+  width: fit-content;
+  padding: size(32);
+}
+
+.divider {
+  content: '';
+  background-color: clr('neutral', 300);
+  height: 2px;
+  border-radius: size(4);
+  margin-block: size(32);
+  opacity: 50%
+}
