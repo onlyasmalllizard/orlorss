@@ -32,23 +32,21 @@ describe('FeedService', () => {
   });
 
   describe('addFeed', () => {
-    beforeEach(() => localStorage.clear());
+    beforeEach(() => jest.clearAllMocks());
 
-    it('should add the given feed to the service and to localstorage', waitForAsync(() => {
+    it('should call mock feeds with the given feed', () => {
+      // @ts-expect-error spying on private method
+      const updateFeeds = jest.spyOn(service, 'updateFeeds')
       const expected = [mockFeed];
 
       service.addFeed(mockFeed);
 
-      const localStorageResult = JSON.parse(localStorage.getItem(LocalStorage.FeedUrls) ?? '');
-      expect(localStorageResult).toEqual(expected);
-      // @ts-expect-error asserting on private property
-      service.feeds$.subscribe({
-        next: feeds => expect(feeds).toEqual(expected),
-        error: e => fail(e)
-      });
-    }));
+      expect(updateFeeds).toHaveBeenCalledWith(expected);
+    });
 
-    it('should not add the feed if it is already stored', waitForAsync(() => {
+    it('should not add the feed if it is already stored', () => {
+      // @ts-expect-error spying on private method
+      const updateFeeds = jest.spyOn(service, 'updateFeeds');
       const initialFeeds = [mockFeed];
       // @ts-expect-error setting private property
       service.feeds$.next(initialFeeds);
@@ -57,24 +55,19 @@ describe('FeedService', () => {
 
       service.addFeed(mockFeed);
 
-      // @ts-expect-error asserting on private property
-      service.feeds$.subscribe({
-        next: feeds => expect(feeds).toEqual(initialFeeds),
-        error: e => fail(e)
-      });
-    }));
+      expect(updateFeeds).not.toHaveBeenCalled();
+    });
   });
 
   describe('deleteFeed', () => {
-    beforeEach(() => localStorage.clear());
-
-    it('should remove the given feed from the service and from local storage', waitForAsync(() => {
+    it('call updateFeeds with the given feed removed from the feeds', () => {
+      // @ts-expect-error spying on private method
+      const updateFeeds = jest.spyOn(service, 'updateFeeds');
       const feeds = [
         { ...mockFeed },
         { ...mockFeed, url: 'test2' },
         { ...mockFeed, url: 'test3' }
       ];
-      localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify(feeds));
       // @ts-expect-error setting private property
       service.feeds$.next(feeds);
       // @ts-expect-error setting private property
@@ -83,14 +76,8 @@ describe('FeedService', () => {
       const expected = feeds.slice(1);
       service.deleteFeed(mockFeed);
 
-      const localStorageResult = JSON.parse(localStorage.getItem(LocalStorage.FeedUrls) ?? '');
-      expect(localStorageResult).toEqual(expected);
-      // @ts-expect-error asserting against private property
-      service.feeds$.subscribe({
-        next: feeds => expect(feeds).toEqual(expected),
-        error: e => fail(e)
-      });
-    }));
+      expect(updateFeeds).toHaveBeenCalledWith(expected);
+    });
 
     it('should remove all articles associated with the given feed', waitForAsync(() => {
       const feeds = [{
@@ -108,6 +95,27 @@ describe('FeedService', () => {
 
       service.articles$.subscribe({
         next: articles => expect(articles).toEqual([]),
+        error: e => fail(e)
+      });
+    }));
+  });
+
+  describe('updateFeeds', () => {
+    it('should update the feeds observable and local storage with the given feeds', waitForAsync(() => {
+      const mockFeeds = [mockFeed];
+      localStorage.clear();
+      // @ts-expect-error setting private property
+      service.feeds$.next([]);
+
+      // @ts-expect-error testing private method
+      service.updateFeeds(mockFeeds);
+
+      const localStorageResult = JSON.parse(localStorage.getItem(LocalStorage.FeedUrls) ?? '');
+      expect(localStorageResult).toEqual(mockFeeds);
+
+      // @ts-expect-error asserting against private property
+      service.feeds$.subscribe({
+        next: feeds => expect(feeds).toEqual(mockFeeds),
         error: e => fail(e)
       });
     }));
@@ -200,9 +208,12 @@ describe('FeedService', () => {
   describe('mapDataToArticles', () => {
     it('should convert the data returned from the RSS feed to the article structure', () => {
       const mockArticle = rss2JsonResponse.items[0];
+      // @ts-expect-error spying on private method
+      jest.spyOn(service, 'normaliseContent').mockReturnValue('normalised content');
+
       const expected: Article = {
         title: mockArticle.title,
-        content: mockArticle.content,
+        content: 'normalised content',
         publishedAt: mockArticle.pubDate,
         url: mockArticle.link,
         source: rss2JsonResponse.feed.title,
@@ -212,6 +223,24 @@ describe('FeedService', () => {
 
       // @ts-expect-error testing private method
       expect(service.mapDataToArticles(rss2JsonResponse)).toEqual([expected]);
+    });
+  });
+
+  describe('normaliseContent', () => {
+    it('should shorten the given text to the given number of words and add an ellipsis', () => {
+      const text = 'hello '.repeat(20);
+      const expected = 'hello '.repeat(9) + 'hello...';
+
+      // @ts-expect-error testing private method
+      expect(service.normaliseContent(text, 10)).toBe(expected);
+    });
+
+    it('should strip the given text of html tags', () => {
+      const text = '<alert>hello</alert>';
+      const expected = 'hello...';
+
+      // @ts-expect-error testing private method
+      expect(service.normaliseContent(text, 10)).toBe(expected);
     });
   });
 });
