@@ -10,6 +10,7 @@ import {FeedService} from "../../services/feed.service";
 import {CardComponent} from "../card/card.component";
 import {AsyncPipe} from "@angular/common";
 import {WINDOW} from "../../providers/window.provider";
+import {SubscriptionUtils} from "../../utils/subscription-utils/subscription-utils.component";
 
 @Component({
   selector: 'app-content-display',
@@ -21,7 +22,7 @@ import {WINDOW} from "../../providers/window.provider";
   styleUrl: './content-display.component.scss',
   standalone: true
 })
-export class ContentDisplayComponent implements AfterViewInit {
+export class ContentDisplayComponent extends SubscriptionUtils implements AfterViewInit {
   /** The grid container for the content */
   @ViewChild('container', {read: ElementRef}) public container: ElementRef<HTMLElement>;
   /** The cards to display in the container */
@@ -30,13 +31,17 @@ export class ContentDisplayComponent implements AfterViewInit {
   constructor(
     public readonly feedService: FeedService,
     @Inject(WINDOW) private readonly window: Window
-  ) {}
+  ) {
+    super();
+  }
 
   /**
    * Subscribes to the cards so that the content will resize on updates
    */
   public ngAfterViewInit() {
-    this.cards.changes.subscribe(() => this.resizeCards());
+    this._subs.add(
+      this.cards.changes.subscribe(() => this.resizeCards())
+    );
   }
 
   /**

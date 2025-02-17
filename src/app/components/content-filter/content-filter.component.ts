@@ -6,6 +6,7 @@ import {FeedService} from "../../services/feed.service";
 import {AsyncPipe} from "@angular/common";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {debounceTime} from "rxjs";
+import {SubscriptionUtils} from "../../utils/subscription-utils/subscription-utils.component";
 
 @Component({
   selector: 'app-content-filter',
@@ -19,7 +20,7 @@ import {debounceTime} from "rxjs";
   styleUrl: './content-filter.component.scss',
   standalone: true
 })
-export class ContentFilterComponent implements OnInit {
+export class ContentFilterComponent extends SubscriptionUtils implements OnInit {
   /** The control to add a content filter */
   public filterControl: FormControl<string|null> = new FormControl<string|null>('');
   /** The search icon to display */
@@ -28,16 +29,20 @@ export class ContentFilterComponent implements OnInit {
   /** The amount of time to debounce the automatic search by */
   @Input() private debounceBy = 800;
 
-  constructor(public readonly feedService: FeedService) {}
+  constructor(public readonly feedService: FeedService) {
+    super();
+  }
 
   /**
    * Subscribes to the form control and updates the filters as the value changes
    */
   public ngOnInit() {
-    this.filterControl.valueChanges.pipe(
-      debounceTime(this.debounceBy)
-    ).subscribe(change => {
-      this.feedService.updateFilters(change)
-    });
+    this._subs.add(
+      this.filterControl.valueChanges.pipe(
+        debounceTime(this.debounceBy)
+      ).subscribe(change => {
+        this.feedService.updateFilters(change)
+      })
+    );
   }
 }
