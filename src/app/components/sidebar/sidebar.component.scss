@@ -1,5 +1,8 @@
+@use '../../../styles/abstracts' as *;
+
 .sidebar {
   width: fit-content;
+  height: 100%;
   padding: size(32);
 }
 
