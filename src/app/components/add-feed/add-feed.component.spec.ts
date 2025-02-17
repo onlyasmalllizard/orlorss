@@ -1,23 +1,48 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { render } from '@testing-library/angular';
 import { AddFeedComponent } from './add-feed.component';
+import {FeedService} from "../../services/feed.service";
+import {userEvent} from "@testing-library/user-event";
+
+const feedService = {
+  addFeed: jest.fn()
+};
+
+const setup = () => render(AddFeedComponent, {
+  providers: [
+    { provide: FeedService, useValue: feedService }
+  ]
+});
 
 describe('AddFeedComponent', () => {
-  let component: AddFeedComponent;
-  let fixture: ComponentFixture<AddFeedComponent>;
+  beforeEach(() => jest.clearAllMocks());
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AddFeedComponent]
-    })
-    .compileComponents();
+  it('should create', async () => {
+    const {fixture } = await setup();
 
-    fixture = TestBed.createComponent(AddFeedComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should submit the data to the feed service if the form is valid', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = await setup();
+
+    await user.type(getByRole('textbox', { name: /name/i }), 'test');
+    await user.type(getByRole('textbox', { name: /url/i }), 'test');
+
+    await user.click(getByRole('button', { name: /add/i }));
+
+    expect(feedService.addFeed).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'test',
+      url: 'test'
+    }));
+  });
+
+  it('should not submit data if the form is invalid', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = await setup();
+
+    await user.click(getByRole('button', { name: /add/i }));
+
+    expect(feedService.addFeed).not.toHaveBeenCalled();
   });
 });

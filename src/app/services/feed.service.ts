@@ -21,8 +21,8 @@ import {Source} from "../models/source.model";
 export class FeedService {
   private content$: Subject<RssResponse[]> = new Subject<RssResponse[]>();
   /** The rss feeds to request articles from */
-  private feeds$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-  private feeds: string[] = [];
+  private feeds$: BehaviorSubject<Source[]> = new BehaviorSubject<Source[]>([]);
+  private feeds: Source[] = [];
   /** The articles returned from the feeds */
   public articles$: Observable<Article[]> = this.content$.pipe(
     tap(content => console.log({content})),
@@ -55,36 +55,33 @@ export class FeedService {
   ) {
   }
 
-  public addFeed(newFeed: string): void {
-    if (!this.feeds.includes(newFeed)) {
+  public addFeed(newFeed: Source): void {
+    const alreadyInFeeds = !!this.feeds.find(feed => feed.url === newFeed.url);
+    if (!alreadyInFeeds) {
       this.updateFeeds([...this.feeds, newFeed]);
     }
   }
 
-  public deleteFeed(feedToDelete: string): void {
-    this.updateFeeds(this.feeds.filter(feed => feed !== feedToDelete));
+  public deleteFeed(feedToDelete: Source): void {
+    this.updateFeeds(this.feeds.filter(feed => feed.url !== feedToDelete.url));
   }
 
-  private updateFeeds(updatedFeeds: string[]): void {
+  private updateFeeds(updatedFeeds: Source[]): void {
     localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify(updatedFeeds));
     this.feeds$.next(updatedFeeds);
   }
 
   /**
-   * Combines the feeds in the service with any feeds stored in local storage, removing duplicates
+   * Gets the feeds from local storage. If there aren't any, returns an empty array.
    *
    * @private
    */
-  private getFeeds(): Observable<string[]> {
+  private getFeeds(): Observable<Source[]> {
     return this.feeds$.pipe(
-      map(feeds => {
+      map(() => {
         const data = localStorage.getItem(LocalStorage.FeedUrls);
-        const storedFeeds: string[] = data ? JSON.parse(data) : ['https://www.adweek.com/feed/', 'https://feeds.bbci.co.uk/news/technology/rss.xml'];
-
-        return [
-          ...feeds,
-          ...storedFeeds.filter((storedFeed) => !feeds.includes(storedFeed))
-        ];
+        return data ? JSON.parse(data) : [{name: 'Adweek', url: 'https://www.adweek.com/feed/'},
+          {name: 'BBC', url: 'https://feeds.bbci.co.uk/news/technology/rss.xml'}];
       }),
       tap(feeds => this.feeds = feeds)
     );
@@ -99,7 +96,7 @@ export class FeedService {
     return this.getFeeds().pipe(
       switchMap(feeds => {
         const apiUrl = 'https://api.rss2json.com/v1/api.json';
-        const responses = feeds.map(feed => this.http.get<RssResponse>(`${apiUrl}?rss_url=${feed}`));
+        const responses = feeds.map(feed => this.http.get<RssResponse>(`${apiUrl}?rss_url=${feed.url}`));
 
         if (responses.length > 0) {
           return forkJoin(responses);

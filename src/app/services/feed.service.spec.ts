@@ -10,6 +10,11 @@ const httpClient = {
   get: jest.fn().mockReturnValue(of(rss2JsonResponse))
 };
 
+const mockFeed = {
+  name: 'test',
+  url: 'test'
+};
+
 describe('FeedService', () => {
   let service: FeedService;
 
@@ -30,10 +35,9 @@ describe('FeedService', () => {
     beforeEach(() => localStorage.clear());
 
     it('should add the given feed to the service and to localstorage', waitForAsync(() => {
-      const newFeed = 'test';
-      const expected = [newFeed];
+      const expected = [mockFeed];
 
-      service.addFeed(newFeed);
+      service.addFeed(mockFeed);
 
       const localStorageResult = JSON.parse(localStorage.getItem(LocalStorage.FeedUrls) ?? '');
       expect(localStorageResult).toEqual(expected);
@@ -45,13 +49,13 @@ describe('FeedService', () => {
     }));
 
     it('should not add the feed if it is already stored', waitForAsync(() => {
-      const initialFeeds = ['test'];
+      const initialFeeds = [mockFeed];
       // @ts-expect-error setting private property
       service.feeds$.next(initialFeeds);
       // @ts-expect-error setting private property
       service.feeds = initialFeeds;
 
-      service.addFeed('test');
+      service.addFeed(mockFeed);
 
       // @ts-expect-error asserting on private property
       service.feeds$.subscribe({
@@ -65,15 +69,19 @@ describe('FeedService', () => {
     beforeEach(() => localStorage.clear());
 
     it('should remove the given feed from the service and from local storage', waitForAsync(() => {
-      const feeds = ['a', 'b', 'c'];
+      const feeds = [
+        { ...mockFeed },
+        { ...mockFeed, url: 'test2' },
+        { ...mockFeed, url: 'test3' }
+      ];
       localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify(feeds));
       // @ts-expect-error setting private property
       service.feeds$.next(feeds);
       // @ts-expect-error setting private property
       service.feeds = feeds;
 
-      const expected = ['a', 'c'];
-      service.deleteFeed('b');
+      const expected = feeds.slice(1);
+      service.deleteFeed(mockFeed);
 
       const localStorageResult = JSON.parse(localStorage.getItem(LocalStorage.FeedUrls) ?? '');
       expect(localStorageResult).toEqual(expected);
@@ -108,16 +116,18 @@ describe('FeedService', () => {
   describe('getFeeds', () => {
     beforeEach(() => localStorage.clear());
 
-    it('should return the feeds from both the service and local storage without duplicates', waitForAsync(() => {
-      const mockFeeds = ['a', 'b', 'c'];
-      // @ts-expect-error setting private property
-      service.feeds$.next(mockFeeds);
-      localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify([...mockFeeds, 'd']));
+    it('should return the feeds from local storage', waitForAsync(() => {
+      const mockFeeds = [
+        { ...mockFeed },
+        { ...mockFeed, url: 'test2' },
+        { ...mockFeed, url: 'test3' }
+      ];
 
-      const expected = ['a', 'b', 'c', 'd'];
+      localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify(mockFeeds));
+
       // @ts-expect-error testing private method
       service.getFeeds().subscribe({
-        next: feeds => expect(feeds).toEqual(expected),
+        next: feeds => expect(feeds).toEqual(mockFeeds),
         error: e => fail(e)
       });
     }));
@@ -134,7 +144,7 @@ describe('FeedService', () => {
   describe('fetchContent', () => {
     it('should request the content using the urls in the feeds property', waitForAsync(() => {
       // @ts-expect-error spying on private method
-      jest.spyOn(service, 'getFeeds').mockReturnValue(of(['test']));
+      jest.spyOn(service, 'getFeeds').mockReturnValue(of([mockFeed]));
 
       // @ts-expect-error testing private method
       service.fetchContent().subscribe({
