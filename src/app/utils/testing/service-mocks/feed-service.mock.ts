@@ -6,5 +6,6 @@ export const feedServiceMock = (config: Partial<FeedService> = {}) => ({
   sources$: of([]),
   addFeed: jest.fn(),
   deleteFeed: jest.fn(),
+  updateFilters: jest.fn(),
   ...config
 });

@@ -1,31 +1,33 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ContentFilterComponent } from './content-filter.component';
-import {ListComponent} from "../list/list.component";
-import {FeedService} from "../../services/feed.service";
+import {render} from "@testing-library/angular";
+import {ContentFilterComponent} from "./content-filter.component";
 import {feedServiceMock} from "../../utils/testing/service-mocks/feed-service.mock";
+import {FeedService} from "../../services/feed.service";
+import {userEvent} from "@testing-library/user-event";
+
+const feedService = feedServiceMock();
+
+const setup = () => render(ContentFilterComponent, {
+  providers: [
+    { provide: FeedService, useValue: feedService }
+  ],
+  inputs: {
+    debounceBy: 0
+  }
+});
 
 describe('ContentFilterComponent', () => {
-  let component: ContentFilterComponent;
-  let fixture: ComponentFixture<ContentFilterComponent>;
+  it('should create', async () => {
+    const { fixture } = await setup();
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [
-        ContentFilterComponent,
-        ListComponent
-      ],
-      providers: [
-        { provide: FeedService, useValue: feedServiceMock() }
-      ]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(ContentFilterComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should send the value to the feed service when the user types it in', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = await setup();
+
+    await user.type(getByRole('textbox', { name: /filter/i }), 'test');
+
+    expect(feedService.updateFilters).toHaveBeenCalledWith('test');
   });
 });

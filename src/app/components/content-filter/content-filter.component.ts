@@ -27,7 +27,7 @@ export class ContentFilterComponent extends SubscriptionUtils implements OnInit 
   public faMagnifyingGlass: IconDefinition = faMagnifyingGlass;
 
   /** The amount of time to debounce the automatic search by */
-  @Input() private debounceBy = 800;
+  @Input() public debounceBy = 800;
 
   constructor(public readonly feedService: FeedService) {
     super();
