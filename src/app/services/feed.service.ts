@@ -2,26 +2,64 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {LocalStorage} from "../utils/enums/localStorage";
 import {RssResponse} from "../models/rss.model";
-import {BehaviorSubject, forkJoin, map, Observable, of, shareReplay, Subject, switchMap, tap} from "rxjs";
+import {
+  BehaviorSubject,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  tap
+} from "rxjs";
 import {Article} from "../models/article.model";
+import {Source} from "../models/source.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class FeedService {
+  private content$: Subject<RssResponse[]> = new Subject<RssResponse[]>();
   /** The rss feeds to request articles from */
   private feeds$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  private feeds: string[] = [];
   /** The articles returned from the feeds */
-  public articles$: Observable<Article[]> = this.fetchContent().pipe(
+  public articles$: Observable<Article[]> = this.content$.pipe(
+    tap(content => console.log({content})),
     map(
       rssResponses => rssResponses.reduce((articles, rssResponse) => ([ ...articles, ...this.mapDataToArticles(rssResponse)]), [] as Article[])
-    ),
-    shareReplay(1)
+    )
+  );
+  public sources$: Observable<Source[]> = this.articles$.pipe(
+    map(
+      articles => articles.reduce((sources: Source[], article: Article) => {
+        const sourcePresent = !!sources.find(source => source.url === article.sourceUrl);
+
+        if (sourcePresent) {
+          return sources;
+        } else {
+          return [
+            ...sources,
+            {
+              name: article.source,
+              url: article.sourceUrl
+            }
+          ]
+        }
+      }, [])
+    )
   );
 
   constructor(
     private readonly http: HttpClient
   ) {}
+
+  public deleteFeed(feedToDelete: string): void {
+    const updatedFeeds = this.feeds.filter(feed => feed !== feedToDelete);
+
+    localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify(updatedFeeds));
+    this.feeds$.next(updatedFeeds);
+  }
 
   /**
    * Combines the feeds in the service with any feeds stored in local storage, removing duplicates
@@ -32,16 +70,14 @@ export class FeedService {
     return this.feeds$.pipe(
       map(feeds => {
         const data = localStorage.getItem(LocalStorage.FeedUrls);
-        const storedFeeds: string[] = data ? JSON.parse(data) : [
-          'https://feeds.bbci.co.uk/news/technology/rss.xml',
-          'https://www.adweek.com/feed/'
-        ];
+        const storedFeeds: string[] = data ? JSON.parse(data) : ['https://www.adweek.com/feed/', 'https://feeds.bbci.co.uk/news/technology/rss.xml'];
 
         return [
           ...feeds,
-          ...storedFeeds.filter(storedFeed => !feeds.includes(storedFeed))
+          ...storedFeeds.filter((storedFeed) => !feeds.includes(storedFeed))
         ];
       }),
+      tap(feeds => this.feeds = feeds)
     );
   }
 
@@ -50,13 +86,19 @@ export class FeedService {
    *
    * @private
    */
-  private fetchContent(): Observable<RssResponse[]> {
+  public fetchContent() {
     return this.getFeeds().pipe(
       switchMap(feeds => {
         const apiUrl = 'https://api.rss2json.com/v1/api.json';
         const responses = feeds.map(feed => this.http.get<RssResponse>(`${apiUrl}?rss_url=${feed}`));
-        return forkJoin(responses);
+
+        if (responses.length > 0) {
+          return forkJoin(responses);
+        } else {
+          return of([]);
+        }
       }),
+      tap(content => this.content$.next(content))
     )
   }
 
@@ -73,7 +115,8 @@ export class FeedService {
       url: item.link,
       publishedAt: item.pubDate,
       source: data.feed.title,
-      image: item.thumbnail
+      image: item.thumbnail,
+      sourceUrl: data.feed.url
     }));
   }
 }

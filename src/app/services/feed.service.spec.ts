@@ -26,6 +26,50 @@ describe('FeedService', () => {
     expect(service).toBeTruthy();
   });
 
+  describe('deleteFeed', () => {
+    beforeEach(() => localStorage.clear());
+
+    it('should remove the given feed from the service and from local storage', waitForAsync(() => {
+      const feeds = ['a', 'b', 'c'];
+      localStorage.setItem(LocalStorage.FeedUrls, JSON.stringify(feeds));
+      // @ts-expect-error setting private property
+      service.feeds$.next(feeds);
+      // @ts-expect-error setting private property
+      service.feeds = feeds;
+
+      const expected = ['a', 'c'];
+      service.deleteFeed('b');
+
+      const localStorageResult = JSON.parse(localStorage.getItem(LocalStorage.FeedUrls) ?? '');
+      expect(localStorageResult).toEqual(expected);
+      // @ts-expect-error asserting against private property
+      service.feeds$.subscribe({
+        next: feeds => expect(feeds).toEqual(expected),
+        error: e => fail(e)
+      });
+    }));
+
+    it('should remove all articles associated with the given feed', waitForAsync(() => {
+      const feeds = [{
+        name: 'test',
+        url: rss2JsonResponse.feed.url
+      }];
+      // @ts-expect-error setting private property
+      service.feeds$.next(feeds);
+      // @ts-expect-error setting private property
+      service.feeds = feeds;
+      // @ts-expect-error mocking private method
+      service.content$.next([rss2JsonResponse]);
+
+      service.deleteFeed(feeds[0].url);
+
+      service.articles$.subscribe({
+        next: articles => expect(articles).toEqual([]),
+        error: e => fail(e)
+      });
+    }));
+  });
+
   describe('getFeeds', () => {
     beforeEach(() => localStorage.clear());
 
@@ -85,7 +129,8 @@ describe('FeedService', () => {
         publishedAt: mockArticle.pubDate,
         url: mockArticle.link,
         source: rss2JsonResponse.feed.title,
-        image: mockArticle.thumbnail
+        image: mockArticle.thumbnail,
+        sourceUrl: rss2JsonResponse.feed.url
       };
 
       // @ts-expect-error testing private method

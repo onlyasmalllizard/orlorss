@@ -11,5 +11,6 @@
              class="fa-xl"></fa-icon>
   </div>
 
-  <app-list></app-list>
+  <app-list [listItems]="feedService.sources$ | async"
+    (deleteItem)="feedService.deleteFeed($event.url)"></app-list>
 </section>

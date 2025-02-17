@@ -1,12 +1,12 @@
 <ul class="grid-flow">
-  @for (item of listItems; track $index) {
+  @for (item of listItems; track item.name) {
     <li class="list-item">
-      {{ item }}
+      {{ item.name }}
 
-      <button>
+      <button (click)="deleteItem.emit(item)">
         <fa-icon [icon]="faXmark"></fa-icon>
 
-        <span class="visually-hidden">Delete item</span>
+        <span class="visually-hidden">Delete {{ item.name }}</span>
       </button>
     </li>
   }
