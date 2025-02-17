@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {LocalStorage} from "../utils/enums/localStorage";
 import {RssResponse} from "../models/rss.model";
 import {
-  BehaviorSubject,
+  BehaviorSubject, combineLatestWith,
   forkJoin,
   map,
   Observable,
@@ -23,12 +23,21 @@ export class FeedService {
   /** The rss feeds to request articles from */
   private feeds$: BehaviorSubject<Source[]> = new BehaviorSubject<Source[]>([]);
   private feeds: Source[] = [];
+  public filteredFeeds$: BehaviorSubject<Source[]> = new BehaviorSubject<Source[]>([]);
   /** The articles returned from the feeds */
   public articles$: Observable<Article[]> = this.content$.pipe(
     tap(content => console.log({content})),
     map(
       rssResponses => rssResponses.reduce((articles, rssResponse) => ([...articles, ...this.mapDataToArticles(rssResponse)]), [] as Article[])
-    )
+    ),
+    combineLatestWith(this.filteredFeeds$),
+    map(([articles, filteredFeeds]) => {
+      if (filteredFeeds.length === 0) {
+        return articles;
+      } else {
+        return articles.filter(article => !!filteredFeeds.find(filter => filter.url === article.sourceUrl))
+      }
+    })
   );
   public sources$: Observable<Source[]> = this.articles$.pipe(
     map(
@@ -50,10 +59,7 @@ export class FeedService {
     )
   );
 
-  constructor(
-    private readonly http: HttpClient
-  ) {
-  }
+  constructor(private readonly http: HttpClient) {}
 
   public addFeed(newFeed: Source): void {
     const alreadyInFeeds = !!this.feeds.find(feed => feed.url === newFeed.url);
@@ -64,6 +70,14 @@ export class FeedService {
 
   public deleteFeed(feedToDelete: Source): void {
     this.updateFeeds(this.feeds.filter(feed => feed.url !== feedToDelete.url));
+  }
+
+  public updateFilters(filter: string | null): void {
+    if (filter) {
+      this.filteredFeeds$.next(this.feeds.filter(feed => feed.name.match(new RegExp(filter, 'i'))));
+    } else {
+      this.filteredFeeds$.next([]);
+    }
   }
 
   private updateFeeds(updatedFeeds: Source[]): void {

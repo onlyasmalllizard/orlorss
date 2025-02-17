@@ -113,6 +113,40 @@ describe('FeedService', () => {
     }));
   });
 
+  describe.only('updateFilters', () => {
+    const mockFeeds = [
+      {...mockFeed, name: 'notme' },
+      { ...mockFeed },
+      { ...mockFeed, name: 'TesT' },
+      { ...mockFeed, name: 'himynameistest' }
+    ];
+
+    it('should update the filtered feeds correctly with feeds matching the given filter regardless of letter case or' +
+      ' location in the feed name', waitForAsync(() => {
+      // @ts-expect-error setting private property
+      service.feeds = mockFeeds;
+
+      service.updateFilters('test');
+
+      service.filteredFeeds$.subscribe({
+        next: feeds => expect(feeds).toEqual(mockFeeds.slice(1)),
+        error: e => fail(e)
+      });
+    }));
+
+    it('should set the filtered feeds to an empty array when the given filter is an empty string', waitForAsync(() => {
+      // @ts-expect-error setting private property
+      service.feeds$.next(mockFeeds);
+
+      service.updateFilters('');
+
+      service.filteredFeeds$.subscribe({
+        next: feeds => expect(feeds).toEqual([]),
+        error: e => fail(e)
+      });
+    }));
+  });
+
   describe('getFeeds', () => {
     beforeEach(() => localStorage.clear());
 

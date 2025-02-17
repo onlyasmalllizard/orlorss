@@ -3,7 +3,8 @@
     <label for="feed-filter"
            class="visually-hidden">Filter your feeds</label>
 
-    <input id="feed-filter"
+    <input [formControl]="filterControl"
+           id="feed-filter"
            placeholder="Filter your feeds..."
            class="margin-inline-end-20"/>
 
@@ -12,5 +13,5 @@
   </div>
 
   <app-list [listItems]="feedService.sources$ | async"
-    (deleteItem)="feedService.deleteFeed($event.url)"></app-list>
+            (deleteItem)="feedService.deleteFeed($event)"></app-list>
 </section>
