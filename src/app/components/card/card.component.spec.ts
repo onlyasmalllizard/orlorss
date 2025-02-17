@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CardComponent } from './card.component';
+import {mockArticle} from "../../utils/testing/data-mocks/article.mock";
 
 describe('CardComponent', () => {
   let component: CardComponent;
@@ -14,14 +15,7 @@ describe('CardComponent', () => {
 
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
-    component.article = {
-      url: '',
-      source: '',
-      publishedAt: '',
-      title: '',
-      content: '',
-      sourceUrl: ''
-    }
+    component.article = mockArticle;
     fixture.detectChanges();
   });
 
