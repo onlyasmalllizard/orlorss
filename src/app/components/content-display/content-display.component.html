@@ -1,6 +1,6 @@
 <section class="content-display"
   #container>
-  @for (article of feedService.articles$ | async; track article.title) {
+  @for (article of feedService.articles$ | async; track article.id) {
     <app-card [article]="article"></app-card>
   }
 </section>

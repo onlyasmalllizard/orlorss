@@ -212,6 +212,7 @@ describe('FeedService', () => {
       jest.spyOn(service, 'normaliseContent').mockReturnValue('normalised content');
 
       const expected: Article = {
+        id: expect.any(String),
         title: mockArticle.title,
         content: 'normalised content',
         publishedAt: mockArticle.pubDate,

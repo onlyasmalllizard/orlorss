@@ -16,6 +16,7 @@ import {
 import {Article} from "../models/article.model";
 import {Source} from "../models/source.model";
 import {DomSanitizer} from "@angular/platform-browser";
+import { v4 as uuid } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -170,6 +171,7 @@ export class FeedService {
   private mapDataToArticles(data: RssResponse): Article[] {
     return data.items.map(item => {
       return {
+        id: uuid(),
         title: item.title,
         content: this.normaliseContent(item.content, 30),
         url: item.link,
