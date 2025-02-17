@@ -1,9 +1,13 @@
 @use '../../../styles/abstracts' as *;
 
 .sidebar {
-  width: fit-content;
+  width: 100%;
   height: 100%;
   padding: size(32);
+
+  @include mq(medium) {
+    width: fit-content;
+  }
 }
 
 .divider {
