@@ -1,0 +1,6 @@
+<section class="content-display"
+  #container>
+  @for (article of feedService.articles$ | async; track article.title) {
+    <app-card [article]="article"></app-card>
+  }
+</section>
