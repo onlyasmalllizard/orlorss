@@ -26,7 +26,6 @@ export class FeedService {
   public filteredFeeds$: BehaviorSubject<Source[]> = new BehaviorSubject<Source[]>([]);
   /** The articles returned from the feeds */
   public articles$: Observable<Article[]> = this.content$.pipe(
-    tap(content => console.log({content})),
     map(
       rssResponses => rssResponses.reduce((articles, rssResponse) => ([...articles, ...this.mapDataToArticles(rssResponse)]), [] as Article[])
     ),
@@ -94,8 +93,7 @@ export class FeedService {
     return this.feeds$.pipe(
       map(() => {
         const data = localStorage.getItem(LocalStorage.FeedUrls);
-        return data ? JSON.parse(data) : [{name: 'Adweek', url: 'https://www.adweek.com/feed/'},
-          {name: 'BBC', url: 'https://feeds.bbci.co.uk/news/technology/rss.xml'}];
+        return data ? JSON.parse(data) : [];
       }),
       tap(feeds => this.feeds = feeds)
     );

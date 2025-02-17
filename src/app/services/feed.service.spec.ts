@@ -104,7 +104,7 @@ describe('FeedService', () => {
       // @ts-expect-error mocking private method
       service.content$.next([rss2JsonResponse]);
 
-      service.deleteFeed(feeds[0].url);
+      service.deleteFeed(feeds[0]);
 
       service.articles$.subscribe({
         next: articles => expect(articles).toEqual([]),
@@ -113,7 +113,7 @@ describe('FeedService', () => {
     }));
   });
 
-  describe.only('updateFilters', () => {
+  describe('updateFilters', () => {
     const mockFeeds = [
       {...mockFeed, name: 'notme' },
       { ...mockFeed },
@@ -180,7 +180,6 @@ describe('FeedService', () => {
       // @ts-expect-error spying on private method
       jest.spyOn(service, 'getFeeds').mockReturnValue(of([mockFeed]));
 
-      // @ts-expect-error testing private method
       service.fetchContent().subscribe({
         next: () => expect(httpClient.get).toHaveBeenCalledWith('https://api.rss2json.com/v1/api.json?rss_url=test'),
         error: e => fail(e)
@@ -191,7 +190,6 @@ describe('FeedService', () => {
       // @ts-expect-error spying on private method
       jest.spyOn(service, 'getFeeds').mockReturnValue(of(['test', 'test2']));
 
-      // @ts-expect-error testing private method
       service.fetchContent().subscribe({
         next: res => expect(res).toEqual([rss2JsonResponse, rss2JsonResponse]),
         error: e => fail(e)
