@@ -8,16 +8,19 @@
 
     <input formControlName="name"
            id="feed-name"
-           placeholder="Type your feed name...">
+           placeholder="Type your feed name..."
+           [class.error]="fieldIsInvalid('name')" />
 
     <label class="visually-hidden"
            for="feed-url">Feed url</label>
 
     <input formControlName="url"
            id="feed-url"
-           placeholder="Copy your RSS url...">
+           placeholder="Copy your RSS url..."
+           [class.error]="fieldIsInvalid('url')" />
 
     <button class="primary"
-      (click)="submit()">Add feed</button>
+            (click)="submit()">Add feed
+    </button>
   </form>
 </section>

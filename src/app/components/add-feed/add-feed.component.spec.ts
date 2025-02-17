@@ -34,14 +34,29 @@ describe('AddFeedComponent', () => {
       name: 'test',
       url: 'test'
     }));
+
+    const nameInput = getByRole('textbox', { name: /name/i });
+    const urlInput = getByRole('textbox', { name: /url/i });
+
+    expect(nameInput.classList).not.toContain('error');
+    expect(urlInput.classList).not.toContain('error');
   });
 
   it('should not submit data if the form is invalid', async () => {
     const user = userEvent.setup();
     const { getByRole } = await setup();
 
+    const nameInput = getByRole('textbox', { name: /name/i });
+    const urlInput = getByRole('textbox', { name: /url/i });
+
+    expect(nameInput.classList).not.toContain('error');
+    expect(urlInput.classList).not.toContain('error');
+
     await user.click(getByRole('button', { name: /add/i }));
 
     expect(feedService.addFeed).not.toHaveBeenCalled();
+
+    expect(nameInput.classList).toContain('error');
+    expect(urlInput.classList).toContain('error');
   });
 });

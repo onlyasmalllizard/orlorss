@@ -7,4 +7,12 @@ input {
   color: clr('neutral', 200);
   padding: size(4) size(16);
   font-style: italic;
+
+  &::placeholder {
+    color: clr('neutral', 300);
+  }
+
+  &.error {
+    border-color: clr('alert', 500);
+  }
 }

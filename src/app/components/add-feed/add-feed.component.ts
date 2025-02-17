@@ -29,10 +29,21 @@ export class AddFeedComponent {
    */
   public submit(): void {
     this.addFeedForm.updateValueAndValidity();
+    this.addFeedForm.markAllAsTouched();
+
     if (this.addFeedForm.valid) {
       this.feedService.addFeed({
         ...this.addFeedForm.getRawValue() as Source
       });
     }
+  }
+
+  /**
+   * Returns whether the given field has any errors. Will return false if the field hasn't been interacted with
+   *
+   * @param field the field to check for errors
+   */
+  public fieldIsInvalid(field: 'name' | 'url'): boolean {
+    return this.addFeedForm.controls[field].invalid && this.addFeedForm.controls[field].touched;
   }
 }
