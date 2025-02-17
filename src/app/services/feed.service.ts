@@ -9,7 +9,6 @@ import {
   map,
   Observable,
   of,
-  shareReplay,
   Subject,
   switchMap,
   tap
@@ -42,8 +41,7 @@ export class FeedService {
       } else {
         return articles.filter(article => !!filteredFeeds.find(filter => filter.url === article.sourceUrl))
       }
-    }),
-    shareReplay(1)
+    })
   );
   /** Observable of the sources the articles are from */
   public sources$: Observable<Source[]> = this.articles$.pipe(
