@@ -5,6 +5,10 @@
   height: 100%;
   padding: size(32);
 
+  display: flex;
+  flex-direction: column;
+  gap: size(32);
+
   @include mq(medium) {
     width: fit-content;
   }

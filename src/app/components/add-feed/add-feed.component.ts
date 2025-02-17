@@ -35,6 +35,8 @@ export class AddFeedComponent {
       this.feedService.addFeed({
         ...this.addFeedForm.getRawValue() as Source
       });
+
+      this.addFeedForm.reset();
     }
   }
 
