@@ -1,4 +1,4 @@
-import {Injectable, SecurityContext} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {LocalStorage} from "../utils/enums/localStorage";
 import {RssResponse} from "../models/rss.model";
@@ -15,7 +15,7 @@ import {
 } from "rxjs";
 import {Article} from "../models/article.model";
 import {Source} from "../models/source.model";
-import { v4 as uuid } from 'uuid';
+import {v4 as uuid} from 'uuid';
 import {ConfigService} from "./config.service";
 
 @Injectable({
@@ -35,6 +35,7 @@ export class FeedService {
     map(
       rssResponses => rssResponses.reduce((articles, rssResponse) => ([...articles, ...this.mapDataToArticles(rssResponse)]), [] as Article[])
     ),
+    map(articles => articles.sort((a, b) => Date.parse(a.publishedAt) - Date.parse(b.publishedAt))),
     combineLatestWith(this.filteredFeeds$),
     map(([articles, filteredFeeds]) => {
       if (filteredFeeds.length === 0) {
@@ -68,7 +69,8 @@ export class FeedService {
   constructor(
     private readonly http: HttpClient,
     private readonly configService: ConfigService
-  ) {}
+  ) {
+  }
 
   /**
    * Checks whether the feed is already stored, and if not, adds it to the feeds
@@ -155,14 +157,17 @@ export class FeedService {
         }
       }),
       map(responses => {
-        return responses.map(response => ({
-          ...response,
-          feed: {
-            ...response.feed,
-            // Uses the feed name the user typed, with the official title as a backup
-            title: this.feeds.find(feed => feed.url === response.feed.url)?.name ?? response.feed.title
+        return responses.map(response => {
+          // Uses the feed name the user typed, with the official title as a backup
+          const title = this.feeds.find(feed => feed.url === response.feed.url)?.name ?? response.feed.title;
+          return {
+            ...response,
+            feed: {
+              ...response.feed,
+              title: title[0].toUpperCase() + title.substring(1)
+            }
           }
-        }))
+        })
       }),
       tap(content => this.content$.next(content))
     )
