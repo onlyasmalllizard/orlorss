@@ -15,7 +15,6 @@ import {
 } from "rxjs";
 import {Article} from "../models/article.model";
 import {Source} from "../models/source.model";
-import {DomSanitizer} from "@angular/platform-browser";
 import { v4 as uuid } from 'uuid';
 import {ConfigService} from "./config.service";
 
@@ -68,8 +67,7 @@ export class FeedService {
 
   constructor(
     private readonly http: HttpClient,
-    private readonly configService: ConfigService,
-    private readonly sanitizer: DomSanitizer
+    private readonly configService: ConfigService
   ) {}
 
   /**
@@ -192,15 +190,15 @@ export class FeedService {
   }
 
   /**
-   * Sanitises the given text, strips html tags from it, and shortens it to the given number of words
+   * Strips any html tags from the given text and shortens it to the given number of words
    *
    * @param text - the text to normalise
    * @param numberOfWords - the number of words to shorten the text to
    * @private
    */
   private normaliseContent(text: string, numberOfWords: number): string {
-    const sanitisedContent = this.sanitizer.sanitize(SecurityContext.HTML, text)?.replace(/<\/?[^>]+(>|$)/gm, '') ?? '';
-    const words = sanitisedContent.split(' ');
+    const processedContent = text.replace(/<\/?[^>]+(>|$)/gm, '');
+    const words = processedContent.split(' ');
     return words.slice(0, numberOfWords).join(' ') + '...';
   }
 }
