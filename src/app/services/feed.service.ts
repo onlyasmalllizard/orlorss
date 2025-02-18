@@ -135,8 +135,6 @@ export class FeedService {
 
   /**
    * Fetches the content from every stored feed and combines the responses
-   *
-   * @private
    */
   public fetchContent() {
     return this.getFeeds().pipe(
