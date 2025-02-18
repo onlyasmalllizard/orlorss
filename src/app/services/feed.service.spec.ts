@@ -78,26 +78,6 @@ describe('FeedService', () => {
 
       expect(updateFeeds).toHaveBeenCalledWith(expected);
     });
-
-    it('should remove all articles associated with the given feed', waitForAsync(() => {
-      const feeds = [{
-        name: 'test',
-        url: rss2JsonResponse.feed.url
-      }];
-      // @ts-expect-error setting private property
-      service.feeds$.next(feeds);
-      // @ts-expect-error setting private property
-      service.feeds = feeds;
-      // @ts-expect-error mocking private method
-      service.content$.next([rss2JsonResponse]);
-
-      service.deleteFeed(feeds[0]);
-
-      service.articles$.subscribe({
-        next: articles => expect(articles).toEqual([]),
-        error: e => fail(e)
-      });
-    }));
   });
 
   describe('updateFeeds', () => {

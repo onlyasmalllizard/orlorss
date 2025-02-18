@@ -6,7 +6,10 @@ import {of} from "rxjs";
 import {mockArticle} from "../../utils/testing/data-mocks/article.mock";
 
 const feedService = feedServiceMock({
-  articles$: of([mockArticle, mockArticle])
+  articles$: of([
+    { ...mockArticle, id: 'a' },
+    { ...mockArticle, id: 'b' }
+  ])
 });
 
 describe('ContentDisplayComponent', () => {
