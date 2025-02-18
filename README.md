@@ -23,7 +23,7 @@ For the masonry layout, I used a blog post from [@andybarefoot](https://medium.c
 In practice, the layout was very hard to control. You'll see that the gaps aren't even between all of the rows. It was also tricky to get the resizing to happen at the correct time, as the cards aren't guaranteed to exist until `afterViewInit`. If I was building a real project or had more time, I would have started again with a different approach.
 
 ### General Code
-The `SubscriptionUtilsComponent` and the `WINDOW` provider are approaches we use at my current job. I found the RegEx to strip HTML tags from a string on this [StackOverflow question](https://stackoverflow.com/questions/5002111/how-to-strip-html-tags-from-string-in-javascript).
+The `ConfigService`, `SubscriptionUtilsComponent` and the `WINDOW` provider are approaches we use at my current job. I found the RegEx to strip HTML tags from a string on this [StackOverflow question](https://stackoverflow.com/questions/5002111/how-to-strip-html-tags-from-string-in-javascript).
 
 ## Comments about the ticket
 ### Card title font
