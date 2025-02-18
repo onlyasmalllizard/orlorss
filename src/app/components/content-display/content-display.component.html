@@ -1,6 +1,12 @@
-<section class="content-display"
-  #container>
-  @for (article of feedService.articles$ | async; track article.id) {
-    <app-card [article]="article"></app-card>
-  }
-</section>
+@if ((feedService.articles$ | async)?.length === 0) {
+  <section #container>
+    <h2 class="fs-800 fw-light | text-centre | margin-32">Sorry, there are no articles to display!</h2>
+  </section>
+} @else {
+  <section class="content-display"
+           #container>
+    @for (article of feedService.articles$ | async; track article.id) {
+      <app-card [article]="article"></app-card>
+    }
+  </section>
+}
