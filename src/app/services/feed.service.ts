@@ -23,7 +23,7 @@ import { v4 as uuid } from 'uuid';
 })
 export class FeedService {
   /** Observable of the content returned from the api */
-  private content$: Subject<RssResponse[]> = new Subject<RssResponse[]>();
+  private content$: Subject<RssResponse[]> = new BehaviorSubject<RssResponse[]>([]);
   /** Observable of the rss feeds to request articles from */
   private feeds$: BehaviorSubject<Source[]> = new BehaviorSubject<Source[]>([]);
   /** Synchronous record of the rss feeds */
