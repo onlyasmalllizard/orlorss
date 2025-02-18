@@ -5,10 +5,14 @@ import {LocalStorage} from "../utils/enums/localStorage";
 import {of} from "rxjs";
 import {rss2JsonResponse} from "../utils/testing/responses/rss2json.response";
 import {Article} from "../models/article.model";
+import {ConfigService} from "./config.service";
+import {httpClientMock} from "../utils/testing/service-mocks/http-client.mock";
 
-const httpClient = {
-  get: jest.fn().mockReturnValue(of(rss2JsonResponse))
-};
+const httpClient = httpClientMock(rss2JsonResponse);
+
+const configService = {
+  apiBaseUrl: of('test')
+}
 
 const mockFeed = {
   name: 'test',
@@ -21,7 +25,8 @@ describe('FeedService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: HttpClient, useValue: httpClient }
+        { provide: HttpClient, useValue: httpClient },
+        { provide: ConfigService, useValue: configService }
       ]
     });
     service = TestBed.inject(FeedService);
@@ -169,7 +174,7 @@ describe('FeedService', () => {
       jest.spyOn(service, 'getFeeds').mockReturnValue(of([mockFeed]));
 
       service.fetchContent().subscribe({
-        next: () => expect(httpClient.get).toHaveBeenCalledWith('https://api.rss2json.com/v1/api.json?rss_url=test'),
+        next: () => expect(httpClient.get).toHaveBeenCalledWith('test?rss_url=test'),
         error: e => fail(e)
       });
     }));

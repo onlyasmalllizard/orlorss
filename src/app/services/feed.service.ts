@@ -17,6 +17,7 @@ import {Article} from "../models/article.model";
 import {Source} from "../models/source.model";
 import {DomSanitizer} from "@angular/platform-browser";
 import { v4 as uuid } from 'uuid';
+import {ConfigService} from "./config.service";
 
 @Injectable({
   providedIn: 'root'
@@ -67,6 +68,7 @@ export class FeedService {
 
   constructor(
     private readonly http: HttpClient,
+    private readonly configService: ConfigService,
     private readonly sanitizer: DomSanitizer
   ) {}
 
@@ -139,8 +141,14 @@ export class FeedService {
   public fetchContent() {
     return this.getFeeds().pipe(
       switchMap(feeds => {
-        const apiUrl = 'https://api.rss2json.com/v1/api.json';
-        const responses = feeds.map(feed => this.http.get<RssResponse>(`${apiUrl}?rss_url=${feed.url}`));
+        // const apiUrl = 'https://api.rss2json.com/v1/api.json';
+        const responses = feeds.map(feed =>
+          this.configService.apiBaseUrl.pipe(
+            switchMap(apiBaseUrl => {
+              return this.http.get<RssResponse>(`${apiBaseUrl}?rss_url=${feed.url}`)
+            })
+          )
+        );
 
         if (responses.length > 0) {
           return forkJoin(responses);
